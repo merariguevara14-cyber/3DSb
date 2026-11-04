@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Módulos y herramientas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap">
+<style>
+:root{--bg:#f5f3fb;--card:#ffffff;--text:#1d1b2e;--muted:#5f5b78;--line:#dcd8ee;--chip:#ece9f8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14121f;--card:#1e1b30;--text:#f0eeff;--muted:#a9a4c7;--line:#34304d;--chip:#2c2845;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14121f;--card:#1e1b30;--text:#f0eeff;--muted:#a9a4c7;--line:#34304d;--chip:#2c2845;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4}
+main{max-width:1000px;margin:0 auto;padding:32px 20px 48px}
+h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.box{background:var(--card);border:2px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+.top{background:var(--c);color:#fff;padding:16px 18px}
+.top b{display:block;font-size:1.5rem;font-weight:800}
+.top span{font-size:.95rem;opacity:.95}
+.tools{padding:14px 18px 18px}
+.tools p{margin:0 0 8px;color:var(--muted);font-size:.9rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--chip);border-radius:999px;padding:6px 12px;font-weight:700;font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Mis módulos</h1>
+<p class="sub">Cada caja muestra el módulo y las herramientas que se usan en él.</p>
+<div class="grid">
+
+<section class="box" style="--c:#5b3fd6"><div class="top"><b>Módulo 1</b><span>BTVDS 3.1 · Desarrollo de aplicaciones de software para la solución de problemas</span></div>
+<div class="tools"><p>Herramientas</p><div class="chips"><span class="chip">Visual Studio Community</span><span class="chip">SQL</span><span class="chip">GitHub</span></div></div></section>
+
+<section class="box" style="--c:#0f8b8d"><div class="top"><b>Módulo 2</b><span>Desarrollo de componentes para dispositivos móviles</span></div>
+<div class="tools"><p>Herramientas</p><div class="chips"><span class="chip">Visual Studio Community</span><span class="chip">GitHub</span></div></div></section>
+
+<section class="box" style="--c:#c2410c"><div class="top"><b>Módulo 3</b><span>Conversación de inglés sobre mantenimiento de sistemas informáticos</span></div>
+<div class="tools"><p>Herramientas</p><div class="chips"><span class="chip">Visual Studio Community</span></div></div></section>
+
+<section class="box" style="--c:#b0306b"><div class="top"><b>Módulo 4</b><span>Puesta en marcha de la empresa en asociatividad cooperativa</span></div>
+<div class="tools"><p>Herramientas</p><div class="chips"><span class="chip">PrestaShop</span><span class="chip">Visual Studio Community</span><span class="chip">Arduino</span></div></div></section>
+
+<section class="box" style="--c:#475569"><div class="top"><b>Módulo 3.2</b><span>Mantenimiento y aseguramiento de la operación del sistema informáticos</span></div>
+<div class="tools"><p>Herramientas</p><div class="chips"><span class="chip">StarUML</span><span class="chip">Excel</span></div></div></section>
+
+<section class="box" style="--c:#a16207"><div class="top"><b>Módulo 3.3</b><span>Administración de Bases de Datos</span></div>
+<div class="tools"><p>Herramientas</p><div class="chips"><span class="chip">Power BI</span><span class="chip">SQL</span><span class="chip">Excel</span></div></div></section>
+
+<section class="box" style="--c:#3f7d20"><div class="top"><b>Módulo 3.4</b><span>Elaboración de documentación de Sistemas informáticos</span></div>
+<div class="tools"><p>Herramientas</p><div class="chips"><span class="chip">Python</span><span class="chip">Visual Studio Code</span></div></div></section>
+
+<section class="box" style="--c:#2563eb"><div class="top"><b>Módulo 3.8</b><span>Proyecto innovador de Desarrollo de Software</span></div>
+<div class="tools"><p>Herramientas</p><div class="chips"><span class="chip">Visual Studio Code</span><span class="chip">GitHub</span></div></div></section>
+
+</div>
+</main>
+</body>
+</html>
