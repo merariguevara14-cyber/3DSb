@@ -61,3 +61,226 @@ h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800;margin:0 0 6px}
 </main>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz por módulo</title>
+<style>
+:root{--bg:#f5f3fb;--card:#fff;--text:#1d1b2e;--muted:#5f5b78;--line:#dcd8ee;--ok:#15803d;--bad:#b91c1c;--c:#5b3fd6}
+@media (prefers-color-scheme:dark){:root{--bg:#14121f;--card:#1e1b30;--text:#f0eeff;--muted:#a9a4c7;--line:#34304d;--ok:#4ade80;--bad:#f87171}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.45}
+main{max-width:760px;margin:0 auto;padding:28px 18px 56px}
+h1{margin:0 0 4px;font-size:clamp(1.6rem,5vw,2.2rem)}
+.sub{color:var(--muted);margin:0 0 20px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.tab{border:2px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--c);border-color:var(--c);color:#fff}
+.head{background:var(--c);color:#fff;border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.head h2{margin:0;font-size:1.2rem}
+.head span{opacity:.95;font-size:.95rem}
+.bar{height:8px;background:rgba(255,255,255,.35);border-radius:99px;margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#fff;transition:width .3s}
+.q{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.q p{margin:0 0 10px;font-weight:700}
+.opt{display:block;width:100%;text-align:left;padding:10px 12px;margin:6px 0;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--text);font:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--c)}
+.opt:disabled{cursor:default}
+.opt.ok{background:rgba(34,197,94,.18);border-color:var(--ok)}
+.opt.bad{background:rgba(239,68,68,.18);border-color:var(--bad)}
+.why{margin:10px 0 0;padding:12px 14px;border-radius:10px;background:var(--line);font-size:.93rem;border-left:6px solid var(--line)}
+.why.ok{border-left-color:var(--ok)}.why.bad{border-left-color:var(--bad)}
+.why strong{display:block;font-size:1.1rem;margin-bottom:2px}
+.why.ok strong{color:var(--ok)}.why.bad strong{color:var(--bad)}
+.opt.ok::after{content:"  ✔ Correcta";font-weight:700;color:var(--ok)}
+.opt.bad::after{content:"  ✖ Tu respuesta";font-weight:700;color:var(--bad)}
+.score{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-weight:700;font-size:.9rem}
+.score span{background:rgba(255,255,255,.22);border-radius:99px;padding:3px 12px}
+#fin{background:var(--card);border:2px solid var(--c);border-radius:14px;padding:18px;text-align:center}
+#fin b{font-size:2rem;display:block}
+.go{background:var(--c);color:#fff;border:0;border-radius:10px;padding:12px 20px;font-weight:700;font-size:1rem;cursor:pointer;margin-top:10px}
+.opt:focus-visible,.tab:focus-visible,.go:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<h1>Quiz por módulo</h1>
+<p class="sub">Elige un módulo y toca la respuesta: verás al instante si acertaste y por qué.</p>
+<div class="tabs" id="tabs" role="tablist"></div>
+<section id="quiz"></section>
+</main>
+
+<script>
+/* [pregunta, [opciones], índice correcta, explicación] */
+const modulos = [
+ {n:"Módulo 1", t:"BTVDS 3.1 · Aplicaciones de software", c:"#5b3fd6", q:[
+  ["¿Qué concepto de POO permite que una clase reciba atributos y métodos de otra?",["Encapsulamiento","Herencia","Compilación","Normalización"],1,"La herencia permite reutilizar el código de una clase base en una clase derivada."],
+  ["¿Qué comando SQL se usa para consultar datos de una tabla?",["INSERT","DELETE","SELECT","CREATE"],2,"SELECT lee datos; INSERT agrega, DELETE borra y CREATE crea objetos."],
+  ["¿Qué comando de Git guarda los cambios en el historial local?",["git commit","git clone","git pull","git init"],0,"git commit registra una versión en tu repositorio local; luego se sube con git push."],
+  ["El polimorfismo consiste en que…",["Una clase no se puede modificar","Un mismo método se comporta distinto según el objeto","Los datos se ocultan","Se crea una base de datos"],1,"Un mismo nombre de método puede tener comportamientos distintos según la clase del objeto."]]},
+ {n:"Módulo 2", t:"Componentes para dispositivos móviles", c:"#0f8b8d", q:[
+  ["¿Para qué se usa XAML en .NET MAUI?",["Para consultar la base de datos","Para definir la interfaz de usuario","Para compilar el código","Para subir a GitHub"],1,"XAML es el lenguaje de marcado que describe las pantallas y controles."],
+  ["¿Qué control permite al usuario escribir texto?",["Label","Button","Entry","Image"],2,"Entry es la caja de texto; Label solo muestra texto."],
+  ["¿Qué evento se dispara al tocar un Button?",["Clicked","Loaded","Appearing","Changed"],0,"Clicked se ejecuta cuando el usuario presiona el botón."],
+  ["Con .NET MAUI se pueden crear apps para…",["Solo Android","Solo iOS","Solo Windows","Android, iOS, Windows y macOS"],3,"MAUI es multiplataforma: un solo proyecto para varios sistemas."]]},
+ {n:"Módulo 3", t:"Inglés sobre mantenimiento de sistemas", c:"#c2410c", q:[
+  ["¿Qué significa «slow computer»?",["Computadora nueva","Computadora lenta","Computadora apagada","Computadora portátil"],1,"«Slow» significa lento."],
+  ["¿Cómo se dice «copia de seguridad» en inglés?",["Backup","Update","Install","Network"],0,"Backup es la copia de seguridad; update es actualización."],
+  ["¿Qué significan las siglas CRUD?",["Copy, Run, Upload, Delete","Create, Read, Update, Delete","Connect, Remove, Upgrade, Debug","Code, Review, Understand, Deploy"],1,"CRUD son las cuatro operaciones básicas sobre datos: crear, leer, actualizar y eliminar."],
+  ["En SCRUM, un período corto de trabajo se llama…",["Sprint","Backlog","Release","Ticket"],0,"El sprint es la iteración de trabajo, normalmente de 1 a 4 semanas."]]},
+ {n:"Módulo 4", t:"Empresa en asociatividad cooperativa", c:"#b0306b", q:[
+  ["En Arduino, ¿qué función se repite continuamente?",["setup()","loop()","begin()","main()"],1,"setup() corre una vez; loop() se repite sin parar."],
+  ["¿Qué hace pinMode(13, OUTPUT)?",["Lee un sensor","Configura el pin 13 como salida","Apaga la placa","Borra el programa"],1,"pinMode define si un pin funciona como entrada o salida."],
+  ["¿Para qué sirve PrestaShop?",["Editar imágenes","Crear una tienda en línea","Diseñar circuitos","Hacer diagramas UML"],1,"PrestaShop es una plataforma de comercio electrónico."],
+  ["Una cooperativa es una asociación de personas que…",["Trabajan juntas para un beneficio común","Compiten entre sí","Solo venden por internet","Pertenecen a un solo dueño"],0,"Sus miembros se asocian y comparten los resultados del trabajo en común."]]},
+ {n:"Módulo 3.2", t:"Mantenimiento y aseguramiento de sistemas", c:"#475569", q:[
+  ["¿Qué significa SLA?",["Sistema de Lectura Automática","Acuerdo de Nivel de Servicio","Sección de Lenguaje Avanzado","Software de Lógica Aplicada"],1,"SLA = Service Level Agreement: define tiempos y calidad del servicio."],
+  ["¿Qué diagrama UML muestra la interacción entre actores y el sistema?",["Diagrama de casos de uso","Diagrama de red","Diagrama de Gantt","Diagrama de barras"],0,"Los casos de uso representan qué hace cada actor con el sistema."],
+  ["El mantenimiento preventivo se realiza…",["Después de que el equipo falla","Antes de que ocurra la falla","Solo cuando el usuario lo pide","Nunca"],1,"Su objetivo es evitar fallas mediante revisiones programadas."],
+  ["Un plan de contingencia sirve para…",["Vender más","Continuar operando ante un fallo o desastre","Diseñar una pantalla","Crear una base de datos"],1,"Define qué hacer para mantener o recuperar el servicio cuando algo falla."]]},
+ {n:"Módulo 3.3", t:"Administración de bases de datos", c:"#a16207", q:[
+  ["¿Qué cláusula SQL filtra filas por una condición?",["ORDER BY","GROUP BY","WHERE","JOIN"],2,"WHERE limita las filas; ORDER BY ordena y GROUP BY agrupa."],
+  ["¿Para qué se usa Power BI?",["Escribir documentos","Analizar y visualizar datos en reportes","Compilar programas","Editar fotos"],1,"Power BI convierte datos en gráficos y dashboards."],
+  ["Una llave primaria…",["Se puede repetir","Identifica de forma única cada registro","Borra la tabla","Solo guarda texto"],1,"No se repite ni es nula: distingue cada fila de la tabla."],
+  ["¿Qué función SQL suma valores?",["COUNT()","AVG()","MAX()","SUM()"],3,"SUM suma; COUNT cuenta, AVG promedia y MAX da el mayor."]]},
+ {n:"Módulo 3.4", t:"Documentación de sistemas informáticos", c:"#3f7d20", q:[
+  ["¿Qué función de Python muestra texto en pantalla?",["show()","echo()","print()","write()"],2,"print() imprime en la consola."],
+  ["¿Cuál es la extensión de un archivo de Python?",[".py",".pt",".pyt",".python"],0,"Los scripts de Python terminan en .py."],
+  ["¿Qué estructura de Python guarda pares clave-valor?",["Lista","Diccionario","Tupla","Cadena"],1,"El diccionario usa llaves {} con pares clave: valor."],
+  ["La documentación técnica de un sistema describe…",["Solo el precio","Su arquitectura, funcionamiento y uso","Solo los colores","Los chistes del equipo"],1,"Sirve para que otras personas entiendan, instalen y mantengan el sistema."]]},
+ {n:"Módulo 3.8", t:"Proyecto innovador de software", c:"#2563eb", q:[
+  ["¿Qué permite GitHub Pages?",["Publicar un sitio web desde un repositorio","Crear bases de datos","Compilar en C#","Grabar videos"],0,"Publica páginas HTML/CSS/JS directamente desde tu repositorio."],
+  ["¿Para qué sirven los GitHub Issues?",["Para dar seguimiento a tareas y errores","Para cambiar el color de la página","Para borrar commits","Para instalar Python"],0,"Los Issues organizan tareas, errores y mejoras del proyecto."],
+  ["¿Qué lenguaje da interactividad a una página web?",["HTML","CSS","JavaScript","SQL"],2,"HTML estructura, CSS da estilo y JavaScript añade comportamiento."],
+  ["El manual de sistema es un documento que explica…",["Solo la rúbrica","Cómo se instala, se usa y funciona el sistema","Los chats del grupo","El horario de clases"],1,"Reúne instalación, uso y funcionamiento del sistema para quien lo reciba."]]}
+];
+
+/* 6 preguntas extra por módulo (en el mismo orden de la lista de arriba) → 10 en total */
+const extras = [
+ [["¿Qué es una clase en POO?",["Una plantilla para crear objetos","Un tipo de base de datos","Un error de compilación","Un comando de Git"],0,"La clase define atributos y métodos; los objetos son sus instancias."],
+  ["¿Qué palabra clave de C# crea una instancia de una clase?",["this","base","static","new"],3,"new reserva e inicializa el objeto, por ejemplo new Persona()."],
+  ["¿Qué restricción SQL evita valores repetidos en una columna?",["UNIQUE","DEFAULT","CHECK","NULL"],0,"UNIQUE impide duplicados en la columna."],
+  ["¿Qué hace git push?",["Descarga cambios","Crea una rama","Sube tus commits al repositorio remoto","Borra el historial"],2,"push envía tus commits locales a GitHub."],
+  ["¿Qué significa «Code First» en Entity Framework?",["Escribir código sin probar","Crear la base de datos a partir de las clases del código","Diseñar solo la interfaz","Importar datos de Excel"],1,"Primero se escriben las clases y el framework genera las tablas."],
+  ["¿Qué modificador hace que un miembro solo sea visible dentro de su clase?",["public","internal","protected","private"],3,"private restringe el acceso a la propia clase (encapsulamiento)."]],
+ [["¿Qué layout apila los controles uno debajo del otro?",["Grid","VerticalStackLayout","AbsoluteLayout","FlexLayout"],1,"VerticalStackLayout coloca sus hijos en columna."],
+  ["¿Qué archivo contiene la lógica (code-behind) de MainPage.xaml?",["App.config","Program.cs","MainPage.xaml.cs","MauiProgram.xaml"],2,"El code-behind lleva el mismo nombre con la extensión .xaml.cs."],
+  ["¿Qué control muestra una lista desplazable de elementos?",["CollectionView","Switch","ProgressBar","DatePicker"],0,"CollectionView presenta colecciones de datos."],
+  ["¿Qué propiedad de un Label define el texto que muestra?",["Source","Value","Text","Title"],2,"Label.Text contiene el texto visible."],
+  ["¿Qué necesitas para probar una app MAUI en Android?",["Solo un navegador","Un emulador o un dispositivo Android","Una impresora","Un servidor de correo"],1,"Se prueba en un emulador o en un teléfono conectado."],
+  ["¿Para qué sirve el enlace de datos (binding)?",["Subir la app a GitHub","Comprimir imágenes","Conectar propiedades de la interfaz con datos del código","Cambiar el nombre del proyecto"],2,"El binding sincroniza la interfaz con los datos."]],
+ [["¿Qué significa «restart»?",["Reiniciar","Apagar","Instalar","Borrar"],0,"Restart = reiniciar el equipo o programa."],
+  ["¿Cómo se traduce «What is the problem?»",["¿Dónde está?","¿Quién eres?","¿Cuál es el problema?","¿Cuánto cuesta?"],2,"Es la pregunta típica de un técnico de soporte."],
+  ["¿Qué significa «password»?",["Usuario","Contraseña","Pantalla","Correo"],1,"Password = contraseña."],
+  ["¿Cuál de estos es un componente de hardware?",["Keyboard","Browser","Antivirus","Spreadsheet"],0,"El keyboard (teclado) es físico; los demás son software."],
+  ["«I need to update the software» significa…",["Necesito comprar un software","Necesito borrar el software","Necesito actualizar el software","Necesito prestar el software"],2,"Update = actualizar."],
+  ["¿Qué significan las siglas AI?",["Advanced Internet","Artificial Intelligence","Automatic Input","Applied Interface"],1,"AI = Artificial Intelligence (inteligencia artificial)."]],
+ [["¿Qué instrucción de Arduino enciende el pin 13?",["digitalWrite(13, HIGH)","digitalRead(13)","analogRead(13)","delay(13)"],0,"digitalWrite con HIGH envía voltaje al pin."],
+  ["¿Para qué se conecta una resistencia a un LED?",["Para que suene","Para limitar la corriente y no quemarlo","Para guardar datos","Para conectarlo a internet"],1,"La resistencia protege al LED de exceso de corriente."],
+  ["¿Cuál es un principio cooperativo?",["El dueño único decide todo","Prohibido asociarse","Ganancias solo para uno","Adhesión voluntaria y abierta"],3,"Cualquier persona puede asociarse libremente."],
+  ["En PrestaShop, una categoría sirve para…",["Agrupar productos similares","Cambiar la moneda","Enviar correos","Programar Arduino"],0,"Las categorías organizan el catálogo de la tienda."],
+  ["¿Qué es Windows Forms (WinForms)?",["Un framework para apps de escritorio con formularios","Un editor de imágenes","Una base de datos","Un servidor web"],0,"WinForms crea aplicaciones de escritorio en .NET."],
+  ["¿Para qué sirve el Monitor Serie del Arduino IDE?",["Para dibujar circuitos","Para ver los datos que envía la placa","Para instalar Windows","Para comprar piezas"],1,"Muestra lo enviado con Serial.println()."]],
+ [["¿Qué es un ticket de soporte?",["Un boleto de cine","Un registro de un incidente o solicitud","Un tipo de cable","Una base de datos"],1,"Permite dar seguimiento a cada incidente."],
+  ["¿Qué mide la disponibilidad de un sistema?",["Su precio","Su tamaño","El porcentaje de tiempo que está operativo","Su color"],2,"Disponibilidad = tiempo en que el sistema funciona."],
+  ["¿Qué muestra un diagrama de clases?",["Clases, atributos, métodos y relaciones","Solo usuarios","Rutas de un mapa","Horarios"],0,"Es el diagrama UML que modela la estructura del sistema."],
+  ["El mantenimiento correctivo se hace…",["Antes de comprar el equipo","Para reparar una falla que ya ocurrió","Nunca","Solo en vacaciones"],1,"Corrige fallas ya presentes."],
+  ["¿Qué es el monitoreo de sistemas?",["Apagar equipos","Observar su estado continuamente para detectar problemas","Borrar archivos","Cambiar contraseñas"],1,"Permite detectar fallas a tiempo."],
+  ["Un respaldo (backup) se hace para…",["Hacer el equipo más rápido","Recuperar la información si se pierde","Cambiar el diseño","Instalar programas"],1,"Es la copia que te salva ante pérdidas de datos."]],
+ [["¿Qué cláusula SQL ordena los resultados?",["WHERE","ORDER BY","HAVING","TOP"],1,"ORDER BY ordena de forma ascendente o descendente."],
+  ["¿Qué es una llave foránea?",["Una contraseña","Un campo que relaciona una tabla con la llave primaria de otra","Un índice de Excel","Un tipo de gráfico"],1,"Establece la relación entre tablas."],
+  ["¿Para qué sirve JOIN?",["Borrar tablas","Combinar filas de dos o más tablas","Hacer copias","Crear usuarios"],1,"JOIN une tablas a través de campos relacionados."],
+  ["¿Qué pasa si ejecutas UPDATE sin WHERE?",["No pasa nada","Da error siempre","Se modifican todas las filas","Se borra la base"],2,"Sin condición, el cambio aplica a toda la tabla."],
+  ["La normalización sirve para…",["Reducir la redundancia de datos","Hacer más grande la base","Cambiar colores","Instalar SQL"],0,"Organiza los datos para evitar duplicados."],
+  ["¿Qué lenguaje de fórmulas usa Power BI?",["DAX","HTML","C++","Bash"],0,"DAX permite crear medidas y columnas calculadas."]],
+ [["¿Cómo se escribe un comentario de una línea en Python?",["// comentario","# comentario","<!-- comentario -->","-- comentario"],1,"En Python el comentario empieza con #."],
+  ["¿Qué palabra clave define una función en Python?",["func","function","def","define"],2,"Se usa def nombre():"],
+  ["¿Qué hace input() en Python?",["Lee datos del teclado","Imprime texto","Borra variables","Crea un archivo"],0,"input() recibe lo que el usuario escribe."],
+  ["¿Qué ciclo recorre los elementos de una lista?",["if","for","def","try"],1,"for elemento in lista: recorre uno por uno."],
+  ["¿Qué fase del ciclo de vida del software sigue después del diseño?",["Análisis de requerimientos","Retiro del sistema","Implementación (codificación)","Planificación inicial"],2,"Análisis → Diseño → Implementación → Pruebas → Mantenimiento."],
+  ["¿Qué función convierte un texto a número entero?",["str()","int()","list()","float()"],1,"int('5') devuelve el número 5."]],
+ [["¿Qué es una rama (branch) en Git?",["Una línea de desarrollo independiente","Un archivo de imagen","Un error","Un usuario"],0,"Permite trabajar en cambios sin afectar la rama principal."],
+  ["¿Para qué sirve el archivo README.md?",["Para guardar contraseñas","Para presentar y explicar el proyecto","Para compilar","Para borrar commits"],1,"Es la portada del repositorio."],
+  ["¿Qué hace git clone?",["Borra el repositorio","Crea una rama","Copia un repositorio remoto a tu equipo","Cambia el nombre"],2,"Descarga el repositorio completo con su historial."],
+  ["¿Para qué sirve CSS?",["Dar estilo y diseño a la página","Guardar datos","Programar la lógica","Enviar correos"],0,"CSS controla colores, tamaños y distribución."],
+  ["¿Cómo debe llamarse la página principal para GitHub Pages?",["home.html","inicio.html","principal.html","index.html"],3,"GitHub Pages busca index.html como portada."],
+  ["¿Qué es un Pull Request?",["Una solicitud para revisar y fusionar cambios","Un error de red","Un tipo de rama","Una descarga de Python"],0,"Propone unir los cambios de una rama a otra."]]
+];
+modulos.forEach((m, i) => m.q.push(...extras[i]));
+
+const tabs = document.getElementById("tabs"), quiz = document.getElementById("quiz");
+let actual = 0, aciertos = 0, hechas = 0;
+
+modulos.forEach((m, i) => {
+  const b = document.createElement("button");
+  b.className = "tab"; b.role = "tab"; b.textContent = m.n;
+  b.onclick = () => mostrar(i);
+  tabs.appendChild(b);
+});
+
+const mezclar = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+function mejor(i, set){
+  try{
+    const k = "quiz10-mejor-" + i;
+    if (set !== undefined) { const p = Number(localStorage.getItem(k) || -1); if (set > p) localStorage.setItem(k, set); }
+    return Number(localStorage.getItem(k) || -1);
+  }catch(e){ return -1; }
+}
+
+function mostrar(i){
+  actual = i; aciertos = 0; hechas = 0;
+  const m = modulos[i];
+  document.documentElement.style.setProperty("--c", m.c);
+  [...tabs.children].forEach((b, j) => b.setAttribute("aria-selected", j === i));
+  const mj = mejor(i);
+  quiz.innerHTML = `<div class="head"><h2>${m.n}</h2><span>${m.t}${mj >= 0 ? " · Mejor: " + mj + "/" + m.q.length : ""}</span><div class="score"><span id="sOk">✔ 0 correctas</span><span id="sBad">✖ 0 incorrectas</span></div><div class="bar"><i id="barra"></i></div></div>` +
+    mezclar(m.q.map((q, k) => k)).map((k, pos) => {
+      const q = m.q[k];
+      const ops = mezclar(q[1].map((o, j) => ({o, ok: j === q[2]})));
+      return `<div class="q" data-k="${k}"><p>${pos + 1}. ${esc(q[0])}</p>` +
+        ops.map(x => `<button class="opt" data-ok="${x.ok}">${esc(x.o)}</button>`).join("") + `</div>`;
+    }).join("") + `<div id="fin" hidden></div>`;
+  quiz.querySelectorAll(".opt").forEach(b => b.onclick = responder);
+}
+
+function responder(e){
+  const btn = e.currentTarget, box = btn.parentElement, m = modulos[actual];
+  box.querySelectorAll(".opt").forEach(o => {
+    o.disabled = true;
+    if (o.dataset.ok === "true") o.classList.add("ok");
+  });
+  const bien = btn.dataset.ok === "true";
+  if (bien) aciertos++; else btn.classList.add("bad");
+  const why = document.createElement("div");
+  why.className = "why " + (bien ? "ok" : "bad");
+  why.innerHTML = `<strong>${bien ? "✔ ¡Correcto!" : "✖ Incorrecto"}</strong>`;
+  why.append(m.q[box.dataset.k][3]);
+  box.appendChild(why);
+  hechas++;
+  const mal = hechas - aciertos;
+  document.getElementById("sOk").textContent = "✔ " + aciertos + (aciertos === 1 ? " correcta" : " correctas");
+  document.getElementById("sBad").textContent = "✖ " + mal + (mal === 1 ? " incorrecta" : " incorrectas");
+  document.getElementById("barra").style.width = (hechas / m.q.length * 100) + "%";
+  if (hechas === m.q.length) terminar();
+}
+
+function terminar(){
+  const m = modulos[actual], n = m.q.length;
+  mejor(actual, aciertos);
+  const msg = aciertos === n ? "¡Perfecto, dominas este módulo!" : aciertos >= n / 2 ? "¡Buen trabajo! Repasa lo que fallaste." : "Repasa el módulo e inténtalo otra vez.";
+  const fin = document.getElementById("fin");
+  fin.hidden = false;
+  fin.innerHTML = `<b>${aciertos} / ${n}</b><p>✔ ${aciertos} correctas · ✖ ${n - aciertos} incorrectas</p><p>${msg}</p><button class="go" id="otra">Intentar de nuevo</button>`;
+  document.getElementById("otra").onclick = () => { mostrar(actual); window.scrollTo({top: 0, behavior: "smooth"}); };
+  fin.scrollIntoView({behavior: "smooth", block: "center"});
+}
+
+mostrar(0);
+</script>
+</body>
+</html>
